@@ -1,5 +1,13 @@
 # 部署步骤
 
+克隆仓库：
+
+```
+git clone https://github.com/gebiWangshushu/hei-yapi-k8s-deploy.git
+```
+
+
+
 ## 第一步 部署MongoDB
 
 > 如果已有MongoDB请跳过这步
@@ -167,3 +175,4 @@ node server/app.js //启动服务器后，请访问 127.0.0.1:{config.json配置
 
 # 源码
 
+https://github.com/gebiWangshushu/hei-yapi-k8s-deploy
