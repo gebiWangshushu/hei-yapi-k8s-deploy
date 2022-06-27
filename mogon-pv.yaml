@@ -1,0 +1,61 @@
+# kubectl create secret generic mongo-azure-secret --from-literal=azurestorageaccountname=sammpn --from-literal=azurestorageaccountkey=kibEhJGVcpUoBJ4rBEtlWRKZ1WGWXPG4Sy5seSA8RxGoyszvbJw+mOUkYJQR6tdktOfWFEPGOCL4JsZ7nh4KKg== -n yapi
+
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  namespace: yapi
+  name: yapi
+spec:
+  capacity:
+    storage: 5Gi
+  accessModes:
+    - ReadWriteMany
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: yapi-csi
+  csi:
+    driver: file.csi.azure.com
+    readOnly: false
+    volumeHandle: pv-yapi-csi-volume  # make sure this volumeid is unique in the cluster
+    volumeAttributes:
+      #resourceGroup: EXISTING_RESOURCE_GROUP_NAME  # optional, only set this when storage account is not in the same resource group as agent node
+      shareName: mongo-fileshare
+    nodeStageSecretRef:
+      name: mongo-azure-secret
+      namespace: yapi
+  mountOptions:
+    - dir_mode=0777
+    - file_mode=0777
+    - uid=0
+    - gid=0
+    - mfsymlinks
+    - cache=strict
+    - nosharesock
+    - nobrl
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  namespace: yapi
+  name: yapi
+spec:
+  accessModes:
+    - ReadWriteMany
+  storageClassName: yapi-csi #需和pv的storageClassName一样
+  volumeName: yapi
+  resources:
+    requests:
+      storage: 5Gi
+---
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: yapi-csi
+parameters:
+  cachingmode: None
+  kind: Managed
+  storageaccounttype: Standard_LRS
+provisioner: file.csi.azure.com
+reclaimPolicy: Delete
+volumeBindingMode: Immediate
+allowVolumeExpansion: true # 允许扩容

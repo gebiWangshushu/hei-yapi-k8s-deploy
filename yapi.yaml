@@ -1,0 +1,83 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: yapi
+  namespace: yapi
+  labels:
+    app: yapi
+spec:
+  ports:
+    - port: 3000
+      targetPort: 3000
+      name: yapi
+      #nodePort: 30003
+    - port: 9090
+      targetPort: 9090
+      name: yapi-conf
+      #nodePort: 30009
+  type: ClusterIP
+  #type: NodePort
+  selector:
+    app: yapi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: yapi
+  namespace: yapi
+  labels:
+    app: yapi
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: yapi
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+  template:
+    metadata:
+      labels:
+        app: yapi
+    spec:
+      containers:
+        - name: yapi
+          image: gebiwangshushu/hei-yapi:latest
+          imagePullPolicy: IfNotPresent
+          resources:
+            limits:
+              cpu: 500m
+              memory: 1024Mi
+            requests:
+              cpu: 200m
+              memory: 512Mi
+          ports:
+          - name: yapi
+            containerPort: 3000
+            protocol: TCP
+          - name: yapi-conf
+            containerPort: 9090
+            protocol: TCP
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: yapi
+  namespace: yapi
+  annotations:
+    nginx.ingress.kubernetes.io/proxy-read-timeout: '3600'
+    nginx.ingress.kubernetes.io/proxy-send-timeout: '3600'
+    nginx.ingress.kubernetes.io/proxy-body-size: 1g
+spec:
+  rules:
+  - host: yapi.mysite.com
+    http:
+      paths:
+        - path: /
+          pathType: Prefix
+          backend:
+            service:
+              name: yapi
+              port:
+                number: 3000
