@@ -1,3 +1,11 @@
+﻿# 背景
+
+找来找去都没找到简单方便的部署yapi到k8s的教程，就自己写了个；
+
+**本教程部署的版本是: 1.10.2** 
+
+
+
 # 部署步骤
 
 克隆仓库：
@@ -20,11 +28,13 @@ kubectl create ns yapi
 
 
 
-创建pv的Secret
+## 创建pv的Secret
 
 ```
 kubectl create secret generic mongo-azure-secret --from-literal=azurestorageaccountname=<blobAccountName> --from-literal=azurestorageaccountkey=<blobAccountKey> -n yapi
 ```
+
+> 如果大家不是很清楚什么是pv/pvc 的需要先去了解下；
 
 
 
@@ -33,6 +43,8 @@ kubectl create secret generic mongo-azure-secret --from-literal=azurestorageacco
 ```
 kubectl apply -f mogon-pv.yaml
 ```
+
+> 我这里是挂载到azure blob file share，大家可以改为挂载到自己喜欢的地方；
 
 
 
@@ -80,7 +92,7 @@ kubectl apply -f yapi.yaml
 
 需要service为NodePort(也可以用kubectl port-forward)，打开：集群ip:<nodeport> 可看到：
 
-## ![1655560044358](../../%E4%B8%AA%E4%BA%BA/blog/images/1655560044358.png)
+## ![1656343915360](images/641760-20220627233206600-238122206-1656344177764.png)
 
 填好配置后看“开始部署“按钮即可，这种简单方便且是官方推荐方式；
 
@@ -93,7 +105,6 @@ kubectl apply -f yapi.yaml
 1、先准备环境
 
 ```
-
 进入pod:
 mkdir yapi
 cd yapi
