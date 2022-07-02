@@ -1,0 +1,83 @@
+# apiVersion: v1
+# kind: Service
+# metadata:
+#   name: yapi-vendors
+#   namespace: yapi
+#   labels:
+#     app: yapi-vendors
+# spec:
+#   ports:
+#     - port: 3000
+#       targetPort: 3000
+#       name: yapi-vendors
+#     - port: 9090
+#       targetPort: 9090
+#       name: yapi-vendors-conf
+#   type: ClusterIP
+#   selector:
+#     app: yapi-vendors
+#---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: yapi-vendors
+  namespace: yapi
+  labels:
+    app: yapi-vendors
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: yapi-vendors
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+  template:
+    metadata:
+      labels:
+        app: yapi-vendors
+    spec:
+      containers:
+        - name: yapi-vendors
+          image: gebiwangshushu/hei-yapi-vendors:latest
+          imagePullPolicy: IfNotPresent
+          workingDir: /app
+          command: ['./startup.sh']
+          resources:
+            limits:
+              cpu: 500m
+              memory: 1024Mi
+            requests:
+              cpu: 200m
+              memory: 512Mi
+          env:
+          - name: YAPI_PORT
+            value: '3000'
+          - name: YAPI_ADMIN_ACCOUNT
+            value: wangsiheng@siluzan.com
+          - name: YAPI_ADMIN_PASSWORD
+            value: zixia@123
+          - name: YAPI_CLOSE_REGISTER
+            value: 'false'
+          - name: YAPI_NPM_REGISTRY
+            value: https://registry.npm.taobao.org
+          - name: YAPI_DB_SERVERNAME
+            value: mongodb
+          - name: YAPI_DB_PORT
+            value: '27017'
+          - name: YAPI_DB_DATABASE
+            value: yapi
+          - name: YAPI_DB_USER
+            value: wangsiheng@siluzan.com
+          - name: YAPI_DB_PASS
+            value: zixia@123
+          - name: YAPI_DB_AUTH_SOURCE
+            value: admin
+          ports:
+          - name: yapi-3000
+            containerPort: 3000
+            protocol: TCP
+          - name: yapi-9090
+            containerPort: 9090
+            protocol: TCP

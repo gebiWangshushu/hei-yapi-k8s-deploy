@@ -98,89 +98,39 @@ kubectl apply -f yapi.yaml
 
 
 
-### 方式二 其他方式(只是思路)
+### 方式二 使用shell自动部署
 
 参考：https://hellosean1025.github.io/yapi/devops/index.html
 
-1、先准备环境
+
+
+1、先修改yapi-vendors.yaml对应环境变量
+
+比如以下是我的配置：
 
 ```
-进入pod:
-mkdir yapi
-cd yapi
-
-wget https://github.91chi.fun//https://github.com/YMFE/yapi/archive/refs/heads/master.zip
-
-unzip master.zip
-
-vm yapi-master venders
-
-cp vendors/config_example.json ./config.json //复制完成后请修改相关配置
-cd vendors
-rm package-lock.json #这个不删会导致安装失败
+YAPI_PORT=3000
+YAPI_ADMIN_ACCOUNT=wangsiheng@gmail.com
+YAPI_ADMIN_PASSWORD=zixia@123
+YAPI_CLOSE_REGISTER=false
+YAPI_NPM_REGISTRY=https://registry.npm.taobao.org
+YAPI_DB_SERVERNAME=127.0.0.1
+YAPI_DB_PORT=27017
+YAPI_DB_DATABASE=yapi
+YAPI_DB_USER=wangsiheng@gmail.com
+YAPI_DB_PASS=password@123
+YAPI_DB_AUTH_SOURCE=admin
 ```
 
+把对应的环境变量替换到yapi-vendors.yaml的`env`下面
 
-
-2、准备配置
-
-替换配置：config.json的值：
+再执行：
 
 ```
-{
-    "port": "3000",
-    "adminAccount": "admin@admin.com",
-    "timeout": 120000,
-    "db": {
-      "servername": "127.0.0.1",
-      "DATABASE": "yapi",
-      "port": 27017,
-      "user": "test1",
-      "pass": "test1",
-      "authSource": ""
-    },
-    "mail": {
-      "enable": true,
-      "host": "smtp.163.com",
-      "port": 465,
-      "from": "***@163.com",
-      "auth": {
-        "user": "***@163.com",
-        "pass": "*****"
-      }
-    }
-}
-```
-
-替换脚本
-
-```
-sed -i 's/\"adminAccount\": \"admin@admin.com\"/\"adminAccount\": '\"${YAPI_ADMIN_ACCOUNT}\"'/g' config.json
-sed -i 's/\"servername\": \"127.0.0.1\"/\"servername\": '\"${YAPI_DB_SERVERNAME}\"'/g' config.json
-sed -i 's/\"DATABASE\": \"yapi\"/\"DATABASE\": '\"${YAPI_DB_DATABASE}\"'/g' config.json
-sed -i 's/\"user\": \"test1\"/\"user\": '\"${YAPI_DB_USER}\"'/g' config.json
-sed -i 's/\"pass\": \"test1\"/\"pass\": '\"${YAPI_DB_PASS}\"'/g' config.json
-sed -i 's/\"authSource\": \"\"/\"authSource\": '\"${YAPI_DB_AUTH_SOURCE}\"'/g' config.json
-sed -i 's/\"host\": \"smtp.163.com\"/\"host\": '\"${YAPI_MAIL_HOST}\"'/g' config.json
-sed -i 's/\"from\": \"\*\*\*@163.com\"/\"from\": '\"${YAPI_MAIL_FROM}\"'/g' config.json
-sed -i 's/\"user\": \"\*\*\*@163.com\"/\"user\": '\"${YAPI_MAIL_AUTH}\"'/g' config.json
-sed -i 's/\"pass\": \"\*\*\*\*\*\"/\"pass\": '\"${YAPI_MAIL_PASS}\"'/g' config.json
-#defual
-sed -i 's/\"port\": \"3000\"/\"port\": '${YAPI_PORT:-3000}'/g' config.json
-sed -i 's/\"port\": 27017/\"port\": '${YAPI_DB_PORT:-27017}'/g' config.json
-sed -i 's/\"enable\": true/\"enable\": '${YAPI_MAIL_ENABlE:-false}'/g' config.json
-sed -i 's/\"port\": 465/\"port\": '${YAPI_MAIL_PORT:-465}'/g' config.json
+kubectl apply -f yapi-vendors.yaml
 ```
 
 
-
-3、启动程序
-
-```
-npm install --production --registry https://registry.npm.taobao.org
-npm run install-server //安装程序会初始化数据库索引和管理员账号，管理员账号名可在 config.json 配置
-node server/app.js //启动服务器后，请访问 127.0.0.1:{config.json配置的端口}，初次运行会有个编译的过程，请耐心等候
-```
 
 
 
