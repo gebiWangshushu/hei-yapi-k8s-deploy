@@ -3,6 +3,7 @@
 #初始化环境
 mkdir yapi && cd yapi
 
+#https://github.com/YMFE/yapi/archive/refs/heads/master.zip 下载原链接(github.91chi.fun是镜像)
 wget https://github.91chi.fun//https://github.com/YMFE/yapi/archive/refs/heads/master.zip
 unzip master.zip
 mv yapi-master vendors

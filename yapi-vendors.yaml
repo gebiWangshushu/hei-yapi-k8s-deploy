@@ -1,22 +1,22 @@
-# apiVersion: v1
-# kind: Service
-# metadata:
-#   name: yapi-vendors
-#   namespace: yapi
-#   labels:
-#     app: yapi-vendors
-# spec:
-#   ports:
-#     - port: 3000
-#       targetPort: 3000
-#       name: yapi-vendors
-#     - port: 9090
-#       targetPort: 9090
-#       name: yapi-vendors-conf
-#   type: ClusterIP
-#   selector:
-#     app: yapi-vendors
-#---
+apiVersion: v1
+kind: Service
+metadata:
+  name: yapi-vendors
+  namespace: yapi
+  labels:
+    app: yapi-vendors
+spec:
+  ports:
+    - port: 3000
+      targetPort: 3000
+      name: yapi-vendors
+    - port: 9090
+      targetPort: 9090
+      name: yapi-vendors-conf
+  type: ClusterIP
+  selector:
+    app: yapi-vendors
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
